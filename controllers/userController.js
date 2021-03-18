@@ -8,7 +8,7 @@ const userController = {
   },
 
   signUp: async (req, res) => {
-    if(req.body.passwordCheck !== req.body.password){
+    if (req.body.passwordCheck !== req.body.password) {
       req.flash('error_messages', '兩次密碼輸入不同！')
       return res.redirect('/signup')
     } 
@@ -16,7 +16,7 @@ const userController = {
     if (userExisted) {
       req.flash('error_messages', '信箱重複！')
       return res.redirect('/signup')
-    } 
+    }     
     let user = await User.create({      
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10), null)
