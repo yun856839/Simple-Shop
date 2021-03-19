@@ -170,7 +170,7 @@ let orderController = {
     // ----------Mail 設定----------
     const mailOptions = {
       from: process.env.GMAIL_ACCOUNT,
-      to: email, // 需改為訂購者 EMAIL
+      to: email,
       subject: `${order.id}訂單成立`,
       text: `${order.id} 訂單成立，總額為 ${amount}`
     }
