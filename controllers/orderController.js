@@ -117,13 +117,25 @@ function getTradeInfo(Amt, Desc, email){
 
 let orderController = {  
   getOrders: async(req, res) => {
-    let orders = await Order.findAll({ include: 'items' })     
+    if (!req.isAuthenticated()) {
+      req.flash('error_messages', "需先登入才可使用")
+      return res.redirect('/signin')  
+    } 
+    let orders = await Order.findAll({
+      where: {UserId: req.user.id},
+      include: 'items' }
+    )     
+    console.log(orders)
     return res.render('orders', {
       orders,    
     })    
   },  
   
   postOrder: async(req, res) => {
+    if (!req.isAuthenticated()) {
+      req.flash('error_messages', "需先登入才可使用")
+      return res.redirect('/signin')  
+    } 
     let cart = await Cart.findByPk(req.body.cartId, {include: 'items'})
     const { name, address, phone, email, shipping_status, payment_status, amount} = req.body    
     const errors = []    
@@ -147,6 +159,7 @@ let orderController = {
       })
     }
     let order = await Order.create({
+      UserId: req.user.id,
       name,
       address,
       phone,
@@ -184,6 +197,7 @@ let orderController = {
     // ----------Mail 設定----------
     
     await Promise.all(results)
+    await Cart.destroy({where: { id:req.body.cartId }})
     req.flash('success_messages', '成立訂單')    
     return res.redirect('/orders')    
   }, 

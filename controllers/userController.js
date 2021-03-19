@@ -11,13 +11,13 @@ const userController = {
     if (req.body.passwordCheck !== req.body.password) {
       req.flash('error_messages', '兩次密碼輸入不同！')
       return res.redirect('/signup')
-    } 
-    let userExisted =  User.findOne({where: {email: req.body.email}})
+    }     
+    let userExisted = await User.findOne({where: {email: req.body.email}})
     if (userExisted) {
       req.flash('error_messages', '信箱重複！')
       return res.redirect('/signup')
     }     
-    let user = await User.create({      
+    await User.create({      
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10), null)
     })
@@ -26,13 +26,24 @@ const userController = {
   },
 
   signInPage: (req, res) => {
+    if (req.isAuthenticated()) {
+      if (req.user.role === 'admin') { 
+        req.flash('error_messages', "已登入請直接使用")
+      return res.redirect('/admin/products')
+      }
+      req.flash('error_messages', "已登入請直接使用")
+      return res.redirect('/products')  
+    } 
     return res.render('signin')
   },
 
   signIn: (req, res) => {
     req.flash('success_messages', '成功登入！')
-    res.redirect('/admin/products')
-  },
+    if (req.user.role === 'admin') { 
+    return res.redirect('/admin/products')
+    }
+    return res.redirect('/products')
+  },  
 
   logout: (req, res) => {
     req.flash('success_messages', '登出成功！')
