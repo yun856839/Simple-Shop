@@ -6,7 +6,7 @@ const PAGE_OFFSET = 0
 
 let cartController = {  
   getCart: async(req, res) => { 
-    console.log(req.session)   
+    // console.log(req.session)   
     let cart = await Cart.findByPk(req.session.cartId, { include: 'items' })
     cart = cart || {items: []}   
     let totalPrice = cart.items.length > 0 ? cart.items.map(d => d.price * d.CartItem.quantity).reduce((a,b) => a + b) : 0

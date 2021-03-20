@@ -46,6 +46,10 @@ const userController = {
   },  
 
   logout: (req, res) => {
+    if (!req.isAuthenticated()) {      
+      req.flash('error_messages', "尚未登入")
+      return res.redirect('/products')  
+    } 
     req.flash('success_messages', '登出成功！')
     req.logout()
     res.redirect('/products')

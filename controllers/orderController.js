@@ -125,7 +125,7 @@ let orderController = {
       where: {UserId: req.user.id},
       include: 'items' }
     )     
-    console.log(orders)
+    // console.log(orders)
     return res.render('orders', {
       orders,    
     })    
@@ -136,26 +136,30 @@ let orderController = {
       req.flash('error_messages', "需先登入才可使用")
       return res.redirect('/signin')  
     } 
-    let cart = await Cart.findByPk(req.body.cartId, {include: 'items'})
+    let cart = await Cart.findByPk(req.body.cartId, {include: 'items'})    
     const { name, address, phone, email, shipping_status, payment_status, amount} = req.body    
     const errors = []    
-    const emailRule = /^\w+((-\w+)|(\.\w+)|(\+\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
+    const emailRule = /^\w+((-\w+)|(\.\w+)|(\+\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/
+    if (!cart) {
+      req.flash('error_messages', "Woops! Your shopping cart is empty!")
+      return res.redirect('back')  
+    }
     if (!name.trim() || !phone.trim() || !address.trim() || !email.trim()) {
       errors.push({ message: '*為必填，不能空白 !' })      
-    }
+    } 
     if (isNaN(phone)) {
       errors.push({ message: '非正確號碼' })      
-    }
+    } 
     if (email.search(emailRule) === -1) {
       errors.push({ message: '非正確 Email' })    
-    }
+    }    
     if (errors.length) {
-    return res.render('cart', {
-      errors,
-      name,
-      address,
-      phone,
-      email,      
+      return res.render('cart', {
+        errors,
+        name,
+        address,
+        phone,
+        email,             
       })
     }
     let order = await Order.create({
