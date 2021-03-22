@@ -137,8 +137,8 @@ let orderController = {
       return res.redirect('/signin')  
     } 
     let cart = await Cart.findByPk(req.body.cartId, {include: 'items'})    
-    const { name, address, phone, email, shipping_status, payment_status, amount} = req.body      
-    if (!cart) {
+    const { name, address, phone, email, shipping_status, payment_status, amount} = req.body  
+    if (!cart || !cart.dataValues.items.length) {
       req.flash('error_messages', "Woops! Your shopping cart is empty!")
       return res.redirect('back')  
     }    
